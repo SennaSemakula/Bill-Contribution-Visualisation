@@ -188,7 +188,7 @@ function loadData(data){
 }
 
 
-loadData("bills.csv");
+loadData("../data/bills.csv");
 
 console.log(data_arr)
 
