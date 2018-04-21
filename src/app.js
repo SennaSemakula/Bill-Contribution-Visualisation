@@ -32,7 +32,7 @@ var dropDownDiv = d3.select("body").append("div")
 
 var select = dropDownDiv.append("select")
 						.attr("class", "select")
-						.on('change',onChange)
+						
 
 
 var buttonDiv = d3.select("body").append("div")
@@ -53,20 +53,75 @@ function createLegends(){
 				.append("g")
 				.attr("class", "expected_legend")
 
-	var legend = legendContainer.data(data_arr)
+	var legend_expected = legendContainer.data(data_arr)
 					.enter()
 
 					colourScale.domain(d3.max(data_arr, function(d){return d.value}))
-					colourScale.domain(d3.max(data_arr, function(d){return d.value}))
+								.range(["#fee0d2","#de2d26"])
 
-	legend.append("rect")
-	.attr("class", "legendrect")
-	.attr("x", function(d, i){return i * 20})
-	.attr("width", 20)
-	.attr("height", 15)
-	.attr("fill", function(d){return colourScale(d.value)})
-	.attr("transform", "translate(874, 80)")
+	var legend_actual = legendContainer.data(data_arr)
+					.enter()
 
+		
+	legend_expected.append("rect")
+		.attr("class", "legendrect")
+		.attr("x", function(d, i){return i * 25})
+		.attr("width", 20)
+		.attr("height", 15)
+		.attr("fill", function(d){return colourScale(d.value)})
+		.attr("transform", "translate(600, 80)")
+
+		colourScale.domain(d3.max(data_arr, function(d){return d.value}))
+								.range(["#edf8b1","#2c7fb8"])
+
+	legend_actual.append("rect")
+		.attr("class", "legendrect_acc")
+		.attr("x", function(d, i){return i * 25})
+		.attr("width", 20)
+		.attr("height", 15)
+		.attr("fill", function(d){return colourScale(d.value)})
+		.attr("transform", "translate(600, 140)")
+
+	console.log("test")
+
+
+}
+
+var selected_val; 
+var month;
+var new_arr  = [];
+
+function drawUpdatedPlots(){
+
+	data_arr = [20, 50, 455, 654, 45]
+
+	/*Getting the max and minimum values of domain*/
+	var maxDomain = d3.max(data_arr, function(d){return d})
+	var minDomain = d3.min(data_arr, function(d){return d})
+
+	/*Colour Scale*/
+							colourScale.domain([minDomain, maxDomain])
+							.range(["#edf8b1","#2c7fb8"])
+
+	var circle = d3.select(".canvas").selectAll(".circleGroup2")
+
+			.data(data_arr)
+			.enter()
+				.append("g")
+				.attr("class", "circleGroup2")
+
+				circle.append("circle")
+				.transition().duration(1200)
+				.attr("cx", function(d, i){return (i+1.5) * 80})
+				.attr("cy", function(d){return yScale(d)})
+				.attr("fill", function(d){return colourScale(d)})
+				.attr("r", 30)
+
+
+					circle.append("text").text(function(d){return d})
+					.transition().duration(1200)
+			.attr("x", function(d, i){return ((i+1.5)  * 80) - 20})
+			.attr("y", function(d){return yScale(d)})
 
 }
 
@@ -79,7 +134,9 @@ function createButtons(){
 							.data(data_arr)
 							.enter()
 								.append("option")
+								.property("selected", function(d){ return "hello" })
 								.text(function(d){return d.family_member;})
+
 
 	//Below is how you get the value of what option is selected
 	console.log(d3.select('select').property('value'))
@@ -88,12 +145,25 @@ function createButtons(){
 
 	buttonDiv.append("input")
 				.attr("type", "text")
-				.attr("name", "valueInput")
+				.attr("id", "valueInput")
 
 
 	buttonDiv.append("button")
+				.attr("width", 50)
+				.attr("height", 50)
+				.attr("id", "btn")
+				.text("Submit")
+				
 
 }
+
+function onClick(){
+	d3.select('#btn').on("click", function(d){
+		alert("Value Updated!")
+	})
+}
+
+
 
 
 var chart_height
@@ -178,17 +248,19 @@ function loadData(data){
 	d3.csv(data, function(d){
 		d.forEach(function (g){
 			data_arr.push(g)
+			month = g.month;
 		})
 
 		drawBubbles();
 
 		createButtons()
 		createLegends()
+		onClick()
 	})
 }
 
 
-loadData("../data/bills.csv");
+loadData("bills.csv");
 
 console.log(data_arr)
 
@@ -296,8 +368,51 @@ function drawBubbles(){
 drawBubbles()
 
 function onChange(){
+	
 
-	console.log(d3.select('select').property('value'))
+	selected_val = d3.select("select").property('value')
+	val_input = d3.select("#valueInput").property("value")
+	console.log(val_input)
+	var test = (Number(val_input))
+
+
+	if(val_input == "" || isNaN(val_input)){
+		console.log(val_input)
+		alert("Please enter a number!")
+	}else{
+		/*Before pushing check if family member has already added their progress, if so update their value*/
+		console.log(selected_val)
+		new_arr.forEach(function(d){
+			console.log(d)
+
+		/*	if(d.family_member == selected_val){
+				console.log("TRUEUEUEUEUEUEU")
+			}*/
+		})
+		new_arr.push({"family_member": selected_val, "value": Number(val_input), "month": month})
+		new_arr.forEach(function(d){
+			console.log(d.family_member)
+		})
+
+		alert("Value updated")
+		/*new_arr.forEach(function(d){
+
+			console.log(d)
+			if(d.family_member == selected_val){
+				d.value = Number(val_input)
+			}else{
+				new_arr.push({"family_member": selected_val, "value": Number(val_input), "month": month})
+			}
+		})*/
+		
+	}
+
+	console.log(new_arr)
+
+	/*push results to array*/
+	
+	
+
 }
 
 
