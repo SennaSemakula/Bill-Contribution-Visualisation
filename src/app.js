@@ -20,6 +20,7 @@ function createCanvas(width, height){
 				.attr("class", "canvas")
 
 	canvas.append("text")
+			.attr("class", "chart_title")
 			.attr("x", canvas_width / 5)
 			.attr("y", 40)
 			.text("Expected Contribution for this month VS Actual")
@@ -228,10 +229,12 @@ function drawAxis(max_domain, min_domain){
 
 
 	d3.select(".canvas").append("g")
+		.attr("class", "axis")
 		.call(yAxis)
 		.attr("transform", "translate(50, 0)");
 
 	d3.select(".canvas").append("g")
+		.attr("class", "axis")
 		.call(xAxis)
 		.attr("transform", "translate(50, " +  canvas_height / 2.31  + ")");
 
@@ -353,8 +356,12 @@ function drawBubbles(){
 				.transition().duration(1200)
 				.attr("cx", function(d, i){return (i+1.5) * 80})
 				.attr("cy", function(d){return yScale(d.value)})
+					.attr("r", 30)
 				.attr("fill", function(d){return colourScale(d.value)})
-				.attr("r", 30)
+				.style("stroke", "black")
+								.style("stroke-width", "1.8px")
+								.style("opacity", .7)
+			
 
 
 					circle.append("text").text(function(d){return d.family_member})
@@ -455,6 +462,8 @@ function onChange(){
 	}	
 
 }
+
+console.log("test")
 
 function details(){
 	var canvas = d3.select(".canvas")
