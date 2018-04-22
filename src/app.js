@@ -23,6 +23,8 @@ function createCanvas(width, height){
 			.attr("x", canvas_width / 5)
 			.attr("y", 40)
 			.text("Expected Contribution for this month VS Actual")
+
+	details()
 	
 }
 
@@ -170,7 +172,7 @@ var chart_height
 /*Function to draw the chart*/
 function drawChart(){
 
-	chart_height = returnRound(canvas_height - 200)
+	chart_height = returnRound(canvas_height - 100)
 	var chart_width = returnRound(canvas_width - 150)
 
 	
@@ -235,7 +237,7 @@ function drawAxis(max_domain, min_domain){
 
 }
 
-createCanvas(1000, 900)
+createCanvas(1000, 700)
 drawChart(250, 250)
 drawAxis()
 
@@ -429,11 +431,12 @@ function onChange(){
 		alert("Please enter a number!")
 	}else{
 		/*Before pushing check if family member has already added their progress, if so update their value*/
+	
 
 		var found = false;
 
 		for(var i = 0; i < new_arr.length; i++) {
-		    if (new_arr[i].family_member == selected_val) {
+		    if (new_arr[i].family_member == selected_val) {	
 		        found = true;
 		        new_arr[i].value = Number(val_input)
 		        break;
@@ -446,13 +449,143 @@ function onChange(){
 			new_arr.push({"family_member": selected_val, "value": Number(val_input), "month": month})
 		}
 
-		alert("Value updated")
+		/*CONTINUE FROM HEREERERERE*/
+		threshHoldState(Number(val_input), selected_val)
+		
+	}	
+
+}
+
+function details(){
+	var canvas = d3.select(".canvas")
+
+				
+
+	canvas.append("text")
+		.attr("id", "threshhold_id")
+		.attr("x", 40)
+		.attr("y", canvas_height / 2)
+		.text("You have not selected an item yet")
+
+		canvas.append("text")
+		.attr("id", "threshhold_value")
+		.attr("x", 40)
+		.attr("y", canvas_height / 1.8)
+		.text("Value: ")
+
+}
+
+
+/*Refactor this whole method
+
+HAVE ALSO HARDCODED TARGETS FOR NOW*/
+function threshHoldState(val, str){
+	/*SENNA*/
+	console.log(val)
+	console.log(str)
+
+	val = val
+	str = str
+
+	if(str == "Senna" && (val < 900)){
+		d3.select(".canvas").select("#threshhold_id").text("You have not met your target")
+
+		d3.select(".canvas").select("#threshhold_value").text("Value left to pay:  " + "\u00a3" + (900 - val))
+				.attr("fill", "red")
+				.attr("font-weight", "bold")
+
+	}else if(str == "Senna" && val >= 900){
+		d3.select(".canvas").select("#threshhold_id").text(function(d){
+			return aboveThreshHold("Senna")
+		})
+		
+		d3.select(".canvas").select("#threshhold_value").text("Value left to pay: 0")
+				.attr("fill", "green")
+				.attr("font-weight", "bold")
 	}
 
-	/*push results to array*/
-	
-	
 
+	/*MAE*/
+	if(str == "Mae" && (val < 750)){
+		d3.select(".canvas").select("#threshhold_id").text("You have not met your target")
+		d3.select(".canvas").select("#threshhold_value").text("Value left to pay:  " + "\u00a3" + (750 - val))
+				.attr("fill", "red")
+				.attr("font-weight", "bold")
+
+	}else{
+		d3.select(".canvas").select("#threshhold_id").text(function(d){
+			return aboveThreshHold("Mae")
+		})
+		
+		d3.select(".canvas").select("#threshhold_value").text("Value left to pay: 0")
+				.attr("fill", "green")
+				.attr("font-weight", "bold")
+	}
+
+	/*PJ*/
+	if(str == "PJ" && (val < 550)){
+		d3.select(".canvas").select("#threshhold_id").text("You have not met your target")
+		d3.select(".canvas").select("#threshhold_value").text("Value left to pay:  " + "\u00a3" + (550 - val))
+				.attr("fill", "red")
+				.attr("font-weight", "bold")
+
+	}else{
+		d3.select(".canvas").select("#threshhold_id").text(function(d){
+			return aboveThreshHold("PJ")
+		})
+		
+		d3.select(".canvas").select("#threshhold_value").text("Value left to pay: 0")
+				.attr("fill", "green")
+				.attr("font-weight", "bold")
+	}
+
+	/*MOET*/
+	if(str == "Moet" && (val >= 0)){
+		d3.select(".canvas").select("#threshhold_id").text(function(d){
+			return aboveThreshHold("Moet")
+		})
+		
+		d3.select(".canvas").select("#threshhold_value").text("Value left to pay: 0")
+				.attr("fill", "green")
+				.attr("font-weight", "bold")
+
+	}
+
+	/*HAPS*/
+	if(str == "Haps" && (val >= 0)){
+		d3.select(".canvas").select("#threshhold_id").text(function(d){
+			return aboveThreshHold("Haps")
+		})
+		
+		d3.select(".canvas").select("#threshhold_value").text("Value left to pay: 0")
+				.attr("fill", "green")
+				.attr("font-weight", "bold")
+
+	}
+
+
+}
+
+
+
+function aboveThreshHold(name){
+	switch(name){
+		case "Senna":
+			return "Congratioulations you have met your target. Well done and go spend it on some gym equipment"
+		break;
+		case "Mae":
+			return "Congratioulations you have met your target. Time to spend some on Fried Chicken Wings!"
+		break;
+		case "PJ":
+			return "Congratioulations you have met your target. Go spend it on limitless amounts of cola bottles"
+		break;
+		case "Moet":
+			return "Finish your degree before you even consider paying rent)"
+		break;
+		case "Haps":
+			return "WAH? You're WAYYY too young to be paying rent. Focus on growing taller"
+		break;
+	}
 }
 
 
