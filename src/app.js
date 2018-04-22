@@ -23,7 +23,7 @@ function createCanvas(width, height){
 			.attr("class", "chart_title")
 			.attr("x", canvas_width / 5)
 			.attr("y", 40)
-			.text("Expected Contribution for this month VS Actual")
+			.text("Expected Contribution for this month")
 
 	details()
 	
@@ -31,15 +31,22 @@ function createCanvas(width, height){
 
 var dropDownDiv = d3.select("body").append("div")
 						.attr("class", "dropDownDiv")
-						.classed("dropDownDiv", true)
+						.classed("container", true)
+
+dropDownDiv.append("text")
+				.attr("id", "name_label")
+				.text("Select your name: ")
+				.classed("divText", true)
+				
 
 var select = dropDownDiv.append("select")
 						.attr("class", "select")
-						
-
+						.classed("container", true)
 
 var buttonDiv = d3.select("body").append("div")
 				.attr("class", "buttonGroup")
+				.classed("container", true)
+
 
 
 var colourScale = d3.scaleLinear()
@@ -109,7 +116,6 @@ function createHighScores(){
 								return i * 30
 							})
 							.attr("y", canvas_height / 8)
-							.text(function(d){return d})
 							.attr("transform", "translate(600, 140)")
 					
 }
@@ -144,7 +150,6 @@ function percentageIncrease(name, val){
 
 function updateHighScores(data){
 	
-
 	data.sort(function(a, b){return b.value - a.value})
 	//delete existing and upadte
 	d3.select(".canvas").selectAll(".highscore").selectAll("text")
@@ -229,7 +234,10 @@ function drawUpdatedPlots(){
 
 function createButtons(){
 
-	dropDownDiv.append("div").text("Enter Contribution (\u00a3): ")
+	dropDownDiv.append("div")
+					.text("Enter Contribution (\u00a3): ")
+					.classed("divText", true)
+
 
 	var options = select.selectAll("option")
 							.data(data_arr)
@@ -243,6 +251,7 @@ function createButtons(){
 
 
 	buttonDiv.append("input")
+
 				.attr("type", "text")
 				.attr("id", "valueInput")
 
@@ -295,7 +304,7 @@ function drawChart(){
 	var yLabel = d3.select(".canvas").append("text")
 		.attr("class", "yLabel")
 		.attr("text-anchor", "end")
-		.attr("y", canvas_width / 50)
+		.attr("y", canvas_width / 400)
 		.attr("dy", ".5em")
 		.attr("transform", "rotate(-90)")
 		.text("Contribution to bills")
@@ -361,6 +370,8 @@ function loadData(data){
 		createButtons()
 		createLegends()
 		onClick()
+
+		d3.select(".canvas").attr("transform", "translate(200, 40)")
 
 	})
 }
@@ -436,6 +447,16 @@ function inputContribution(){
 
 
 function drawBubbles(){
+
+	var canvas = d3.select(".canvas")
+	var month;
+
+	data_arr.forEach(function(d){
+		month = d.month
+	})
+
+	console.log(month)
+	canvas.select(".chart_title").text("Expected contribution to bills for " + month)
 
 	/*Getting the max and minimum values of domain*/
 	var maxDomain = d3.max(data_arr, function(d){return d.value})
@@ -568,21 +589,24 @@ function onChange(){
 function details(){
 	var canvas = d3.select(".canvas")
 
-				
-
 	canvas.append("text")
 		.attr("id", "threshhold_id")
 		.attr("x", 40)
 		.attr("y", canvas_height / 2)
-		.text("You have not selected an item yet")
+		.text("Please enter your contribution for this month")
+
 
 		canvas.append("text")
 		.attr("id", "threshhold_value")
 		.attr("x", 40)
 		.attr("y", canvas_height / 1.8)
-		.text("Value: ")
 
+		canvas.append("text")
+		.attr("id", "feedback_id")
+		.attr("x", canvas_width / 8.5)
+		.attr("y", canvas_height / 1.5)
 
+		//.attr("transform", "translate(30, 50)")
 }
 
 
@@ -591,9 +615,6 @@ function details(){
 HAVE ALSO HARDCODED TARGETS FOR NOW*/
 function threshHoldState(val, str){
 	/*SENNA*/
-	console.log(val)
-	console.log(str)
-
 	val = val
 	str = str
 
@@ -604,6 +625,12 @@ function threshHoldState(val, str){
 				.attr("fill", "red")
 				.attr("font-weight", "bold")
 
+		d3.select(".canvas").select("#feedback_id").text("CONTRIBUTE MORE!")
+				.attr("fill", "red")
+				.attr("font-weight", "bold")
+				.attr("font-size", 50)
+				.classed("#feedback", true)
+
 	}else if(str == "Senna" && val >= 900){
 		d3.select(".canvas").select("#threshhold_id").text(function(d){
 			return aboveThreshHold("Senna")
@@ -612,6 +639,12 @@ function threshHoldState(val, str){
 		d3.select(".canvas").select("#threshhold_value").text("Value left to pay: 0")
 				.attr("fill", "green")
 				.attr("font-weight", "bold")
+
+		d3.select(".canvas").select("#feedback_id").text("WELL DONE!")
+				.attr("fill", "green")
+				.attr("font-weight", "bold")
+				.attr("font-size", 50)
+				.classed("#feedback", true)
 	}
 
 
@@ -622,6 +655,12 @@ function threshHoldState(val, str){
 				.attr("fill", "red")
 				.attr("font-weight", "bold")
 
+		d3.select(".canvas").select("#feedback_id").text("CONTRIBUTE MORE!")
+				.attr("fill", "red")
+				.attr("font-weight", "bold")
+				.attr("font-size", 50)
+				.classed("#feedback", true)
+
 	}else{
 		d3.select(".canvas").select("#threshhold_id").text(function(d){
 			return aboveThreshHold("Mae")
@@ -630,6 +669,12 @@ function threshHoldState(val, str){
 		d3.select(".canvas").select("#threshhold_value").text("Value left to pay: 0")
 				.attr("fill", "green")
 				.attr("font-weight", "bold")
+
+		d3.select(".canvas").select("#feedback_id").text("WELL DONE!")
+				.attr("fill", "green")
+				.attr("font-weight", "bold")
+				.attr("font-size", 50)
+				.classed("#feedback", true)
 	}
 
 	/*PJ*/
@@ -639,6 +684,12 @@ function threshHoldState(val, str){
 				.attr("fill", "red")
 				.attr("font-weight", "bold")
 
+		d3.select(".canvas").select("#feedback_id").text("CONTRIBUTE MORE!")
+				.attr("fill", "red")
+				.attr("font-weight", "bold")
+				.attr("font-size", 50)
+				.classed("#feedback", true)
+
 	}else{
 		d3.select(".canvas").select("#threshhold_id").text(function(d){
 			return aboveThreshHold("PJ")
@@ -647,6 +698,12 @@ function threshHoldState(val, str){
 		d3.select(".canvas").select("#threshhold_value").text("Value left to pay: 0")
 				.attr("fill", "green")
 				.attr("font-weight", "bold")
+
+		d3.select(".canvas").select("#feedback_id").text("WELL DONE!")
+				.attr("fill", "green")
+				.attr("font-weight", "bold")
+				.attr("font-size", 50)
+				.classed("#feedback", true)
 	}
 
 	/*MOET*/
@@ -659,6 +716,12 @@ function threshHoldState(val, str){
 				.attr("fill", "green")
 				.attr("font-weight", "bold")
 
+		d3.select(".canvas").select("#feedback_id").text("WELL DONE!")
+				.attr("fill", "green")
+				.attr("font-weight", "bold")
+				.attr("font-size", 50)
+				.classed("#feedback", true)
+
 	}
 
 	/*HAPS*/
@@ -670,6 +733,12 @@ function threshHoldState(val, str){
 		d3.select(".canvas").select("#threshhold_value").text("Value left to pay: 0")
 				.attr("fill", "green")
 				.attr("font-weight", "bold")
+
+		d3.select(".canvas").select("#feedback_id").text("WELL DONE!")
+				.attr("fill", "green")
+				.attr("font-weight", "bold")
+				.attr("font-size", 50)
+				.classed("#feedback", true)
 
 	}
 
