@@ -82,7 +82,7 @@ function createLegends(){
 		.attr("fill", function(d){return colourScale(d.value)})
 		.attr("transform", "translate(600, 140)")
 
-	console.log("test")
+
 
 
 }
@@ -139,8 +139,6 @@ function createButtons(){
 
 
 	//Below is how you get the value of what option is selected
-	console.log(d3.select('select').property('value'))
-	console.log(data_arr)
 
 
 	buttonDiv.append("input")
@@ -159,7 +157,9 @@ function createButtons(){
 
 function onClick(){
 	d3.select('#btn').on("click", function(d){
-		alert("Value Updated!")
+		onChange()
+		updateBubbles()
+		test()
 	})
 }
 
@@ -239,7 +239,7 @@ createCanvas(1000, 900)
 drawChart(250, 250)
 drawAxis()
 
-console.log(canvas_height)
+
 
 var data_arr = []
 
@@ -256,13 +256,13 @@ function loadData(data){
 		createButtons()
 		createLegends()
 		onClick()
+
 	})
 }
 
 
 loadData("bills.csv");
 
-console.log(data_arr)
 
 function maxContribution(arr){
 	var temp = 0;
@@ -274,7 +274,6 @@ function maxContribution(arr){
 		}
 	}
 
-	console.log(max)
 
 	return max
 
@@ -346,7 +345,7 @@ function drawBubbles(){
 			.data(data_arr)
 			.enter()
 				.append("g")
-				.attr("class", "circleGroup")
+				.attr("class", function(d){return "circleGroup_" + d.family_member})
 
 				circle.append("circle")
 				.transition().duration(1200)
@@ -361,53 +360,94 @@ function drawBubbles(){
 			.attr("x", function(d, i){return ((i+1.5)  * 80) - 20})
 			.attr("y", function(d){return yScale(d.value)})
 
-
-
 }
 
 drawBubbles()
+
+function test(){
+
+	console.log(new_arr)
+
+	d3.select(".canvas").selectAll(".circleGroup_" + selected_val).selectAll("circle")
+		.data(new_arr, function(d){
+			if(d.family_member == selected_val){
+				return d
+			}
+		}).transition().duration(1200)
+				.attr("cx", function(d, i){return ((i+1.5) * 80) - 27 })
+				.attr("cy", function(d){return yScale(d.value)})
+				.attr("fill", function(d){return colourScale(d.value)})
+				.attr("r", 30)
+
+
+	d3.select(".canvas").selectAll(".circleGroup_" + selected_val).selectAll("text")
+						.data(new_arr, function(d){
+							if(d.family_member == selected_val){
+								return d
+							}
+						})
+						.transition().duration(1200)
+						.text(function(d){return d.family_member})
+						.attr("x", function(d, i){return ((i+1.5) * 80) - 34})
+						.attr("y", function(d){return yScale(d.value)})
+
+}
+
+
+
+function updateBubbles(){
+
+	d3.select(".canvas").selectAll("circleGroup_" + selected_val)
+					.data(new_arr, function(d){
+						if(d.family_member == selected_val){
+							console.log(d)
+							return d
+						}
+					})
+					.transition().duration(1200)
+				.attr("cx", function(d, i){return (i+1.5) * 80})
+				.attr("cy", function(d){return yScale(d.value)})
+				.attr("fill", function(d){return colourScale(d.value)})
+				.attr("r", 30)
+
+}
+
+
 
 function onChange(){
 	
 
 	selected_val = d3.select("select").property('value')
 	val_input = d3.select("#valueInput").property("value")
-	console.log(val_input)
 	var test = (Number(val_input))
+
+	var in_arr = true; 
+	var count = 0;
 
 
 	if(val_input == "" || isNaN(val_input)){
-		console.log(val_input)
 		alert("Please enter a number!")
 	}else{
 		/*Before pushing check if family member has already added their progress, if so update their value*/
-		console.log(selected_val)
-		new_arr.forEach(function(d){
-			console.log(d)
 
-		/*	if(d.family_member == selected_val){
-				console.log("TRUEUEUEUEUEUEU")
-			}*/
-		})
-		new_arr.push({"family_member": selected_val, "value": Number(val_input), "month": month})
-		new_arr.forEach(function(d){
-			console.log(d.family_member)
-		})
+		var found = false;
+
+		for(var i = 0; i < new_arr.length; i++) {
+		    if (new_arr[i].family_member == selected_val) {
+		        found = true;
+		        new_arr[i].value = Number(val_input)
+		        break;
+		    }else{
+		    	found = false;
+		    }
+		}
+
+		if(!found){
+			new_arr.push({"family_member": selected_val, "value": Number(val_input), "month": month})
+		}
 
 		alert("Value updated")
-		/*new_arr.forEach(function(d){
-
-			console.log(d)
-			if(d.family_member == selected_val){
-				d.value = Number(val_input)
-			}else{
-				new_arr.push({"family_member": selected_val, "value": Number(val_input), "month": month})
-			}
-		})*/
-		
 	}
-
-	console.log(new_arr)
 
 	/*push results to array*/
 	
