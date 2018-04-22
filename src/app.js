@@ -44,9 +44,9 @@ var buttonDiv = d3.select("body").append("div")
 
 var colourScale = d3.scaleLinear()
 
-function sortAscending(arr, val){
+function sortAscending(arr){
 	arr.sort(function(x, y){
-		return (d3.ascending(x.val, y.val))
+		return (d3.ascending(x, y))
 	})
 }
 
@@ -86,8 +86,106 @@ function createLegends(){
 		.attr("transform", "translate(600, 140)")
 
 
+}
+
+function createHighScores(){
+	var canvas = d3.select(".canvas")
 
 
+		data = [1, 20, 40]
+		
+
+		var group = canvas.selectAll(".highscore")
+					.data(data)
+					.enter()
+					.append("g")
+						.attr("class", "highscore")
+						
+
+		data = [2, 35, 54, 534, 12]
+		group.append("text")
+			.attr("id", "score_text")
+							.attr("x", function(d, i){
+								return i * 30
+							})
+							.attr("y", canvas_height / 8)
+							.text(function(d){return d})
+							.attr("transform", "translate(600, 140)")
+					
+}
+
+
+function percentageIncrease(name, val){
+	var result 
+	var target
+	switch(name){
+		case "Senna":
+			target = 900
+			result = (val / target) * 100
+		break;
+		case "Mae":
+			target = 750
+			result = (val / target) * 100
+		break;
+		case "PJ":
+			target = 550
+			result = (val / target) * 100
+		break;
+		case "Moet":
+			target = 0
+			result = (val / target) * 100
+		break;
+		case "Haps":
+			target = 0
+			result = (val / target) * 100
+		break;
+	}
+}
+
+function updateHighScores(data){
+	
+
+	data.sort(function(a, b){return b.value - a.value})
+	//delete existing and upadte
+	d3.select(".canvas").selectAll(".highscore").selectAll("text")
+			.remove()
+
+	//following used to update if entries are the same
+	/*d3.select(".canvas").selectAll(".highscore")
+				.data([1, 20, 40]).exit()
+*/
+	d3.select(".canvas").selectAll(".highscore")
+				.data([1, 20, 40]).remove()
+
+	d3.select(".canvas").selectAll(".highscore")
+				.data(data).enter()
+					.append("g", "highscore")
+					.attr("class", "highscore")
+
+d3.select(".canvas").selectAll(".highscore")
+						.append("text")
+							.transition().duration(1200)
+								.attr("y", function(d, i){return i * 40})
+								.attr("transform", "translate(600, 140)")
+								.text(function(d, i){return (i + 1).toString() + ". " + d.family_member})
+
+
+data.forEach(function(d){
+
+})
+				
+
+console.log(data)
+
+/*	d3.select("canvas").selectAll(".highscore")
+		.append("text")
+			.attr("id", "score_text")
+							.attr("x", function(d, i){
+								return i * 30
+							})
+							.attr("y", canvas_height / 8)
+							.text(function(d){return d})
+							.attr("transform", "translate(600, 140)")*/
 }
 
 var selected_val; 
@@ -98,7 +196,7 @@ function drawUpdatedPlots(){
 
 	data_arr = [20, 50, 455, 654, 45]
 
-	/*Getting the max and minimum values of domain*/
+	/*Getting the max and minimum values of domain
 	var maxDomain = d3.max(data_arr, function(d){return d})
 	var minDomain = d3.min(data_arr, function(d){return d})
 
@@ -162,6 +260,7 @@ function onClick(){
 	d3.select('#btn').on("click", function(d){
 		onChange()
 		updateBubbles()
+		updateHighScores(new_arr)
 		test()
 	})
 }
@@ -257,6 +356,7 @@ function loadData(data){
 		})
 
 		drawBubbles();
+		createHighScores()
 
 		createButtons()
 		createLegends()
@@ -375,8 +475,6 @@ drawBubbles()
 
 function test(){
 
-	console.log(new_arr)
-
 	d3.select(".canvas").selectAll(".circleGroup_" + selected_val).selectAll("circle")
 		.data(new_arr, function(d){
 			if(d.family_member == selected_val){
@@ -409,7 +507,6 @@ function updateBubbles(){
 	d3.select(".canvas").selectAll("circleGroup_" + selected_val)
 					.data(new_arr, function(d){
 						if(d.family_member == selected_val){
-							console.log(d)
 							return d
 						}
 					})
@@ -454,16 +551,19 @@ function onChange(){
 
 		if(!found){
 			new_arr.push({"family_member": selected_val, "value": Number(val_input), "month": month})
+			
 		}
 
+
 		/*CONTINUE FROM HEREERERERE*/
+		// console.log(d3.select("#valueInput").property("value", ""))
+		alert("Value successfully updated")
 		threshHoldState(Number(val_input), selected_val)
-		
+
 	}	
 
 }
 
-console.log("test")
 
 function details(){
 	var canvas = d3.select(".canvas")
@@ -481,6 +581,7 @@ function details(){
 		.attr("x", 40)
 		.attr("y", canvas_height / 1.8)
 		.text("Value: ")
+
 
 }
 
